@@ -79,7 +79,7 @@ var APSoutheast = Region{
 	"https://sdb.ap-southeast-1.amazonaws.com",
 	"https://sns.ap-southeast-1.amazonaws.com",
 	"https://sqs.ap-southeast-1.amazonaws.com",
-	"https://dynamodb.ap-southeast-1.amazonaws.com"
+	"https://dynamodb.ap-southeast-1.amazonaws.com",
 }
 
 var APNortheast = Region{

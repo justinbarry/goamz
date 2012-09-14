@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"launchpad.net/goamz/aws"
-	"launchpad.net/goamz/s3"
+	"goamz/aws"
+	"goamz/s3"
 	. "launchpad.net/gocheck"
 )
 

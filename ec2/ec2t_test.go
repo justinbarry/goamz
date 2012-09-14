@@ -2,9 +2,9 @@ package ec2_test
 
 import (
 	"fmt"
-	"launchpad.net/goamz/aws"
-	"launchpad.net/goamz/ec2"
-	"launchpad.net/goamz/ec2/ec2test"
+	"goamz/aws"
+	"goamz/ec2"
+	"goamz/ec2/ec2test"
 	. "launchpad.net/gocheck"
 	"regexp"
 	"sort"

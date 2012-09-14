@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"launchpad.net/goamz/aws"
-	"launchpad.net/goamz/s3"
+	"goamz/aws"
+	"goamz/s3"
 	. "launchpad.net/gocheck"
 	"time"
 )
