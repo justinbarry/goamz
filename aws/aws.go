@@ -27,6 +27,7 @@ type Region struct {
 	SDBEndpoint          string
 	SNSEndpoint          string
 	SQSEndpoint          string
+	DynamoDBEndpoint     string
 }
 
 var USEast = Region{
@@ -39,6 +40,7 @@ var USEast = Region{
 	"https://sdb.amazonaws.com",
 	"https://sns.us-east-1.amazonaws.com",
 	"https://sqs.us-east-1.amazonaws.com",
+	"https://dynamodb.us-east-1.amazonaws.com",
 }
 
 var USWest = Region{
@@ -51,6 +53,7 @@ var USWest = Region{
 	"https://sdb.us-west-1.amazonaws.com",
 	"https://sns.us-west-1.amazonaws.com",
 	"https://sqs.us-west-1.amazonaws.com",
+	"https://dynamodb.us-west-1.amazonaws.com",
 }
 
 var EUWest = Region{
@@ -63,6 +66,7 @@ var EUWest = Region{
 	"https://sdb.eu-west-1.amazonaws.com",
 	"https://sns.eu-west-1.amazonaws.com",
 	"https://sqs.eu-west-1.amazonaws.com",
+	"https://dynamodb.eu-west-1.amazonaws.com",
 }
 
 var APSoutheast = Region{
@@ -75,6 +79,7 @@ var APSoutheast = Region{
 	"https://sdb.ap-southeast-1.amazonaws.com",
 	"https://sns.ap-southeast-1.amazonaws.com",
 	"https://sqs.ap-southeast-1.amazonaws.com",
+	"https://dynamodb.ap-southeast-1.amazonaws.com"
 }
 
 var APNortheast = Region{
@@ -87,6 +92,7 @@ var APNortheast = Region{
 	"https://sdb.ap-northeast-1.amazonaws.com",
 	"https://sns.ap-northeast-1.amazonaws.com",
 	"https://sqs.ap-northeast-1.amazonaws.com",
+	"https://dynamodb.ap-northeast-1.amazonaws.com",
 }
 
 var Regions = map[string]Region{
