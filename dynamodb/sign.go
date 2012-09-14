@@ -23,7 +23,7 @@ func (s *Server) Sign(host string, params url.Values, headers http.Header) []str
 	secret := server.derivedSecret(now)
 	hash := hmac.New(sha256.New, secret)
 
-	createSignature(hash, params, headers)
+	server.createSignature(hash, now, params, headers)
 
 	auth := bytes.NewBufferString("AWS4-HMAC-SHA256 ")
 	auth.Write([]byte("Credential=" + auth.AccessKey + "/" + server.credentials(now) + ", "))
@@ -70,9 +70,26 @@ func headerList(headers http.Header) []byte {
 	return a.Join(";")
 }
 
-func createSignature(hash hash.Hash,  params url.Values, headers http.Header){
+func (s *Server) createSignature(hash hash.Hash, now time.Time, params url.Values, headers http.Header){
 
 	sig := bytes.NewBufferString("AWS4-HMAC-SHA256\n")	
-	sig.write([]byte(
+	sig.write([]byte(t.Format()))
+	sig.write([]byte("\n"))
+	
+	sig.Write([]byte(s.credentials))
+	sig.Write([]byte("\n"))
+	
+	hash := sha256.New()
 
+	s.createRequest(h, params, headers)
+
+	sig.Write(fmt.Sprintf("%x", h.Sum(nil)))
+
+	return sig.String()
+}
+
+func (s *Server) createRequest(hash hash.Hash, params url.Values, headers http.Header){
+	
+	
+	
 }
