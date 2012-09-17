@@ -40,53 +40,62 @@ type Attribute struct {
 
 func (s *Server) queryServer(target string, params url.Values, query *Query) ([]byte, error) {
 	url, err := url.Parse(s.Region.DynamoDBEndpoint)
+
 	headers := map[string][]string{
-		"contnt-type": {"application/x-amz-json-1.0"},
-		"x-amz-date": {requestDate()},
+		"content-type": {"application/x-amz-json-1.0"},
+		"Date": {requestDate()},
 		"x-amz-target": {target},
 	}
 
 	if err != nil {
 		return nil, err
 	}
-	
-	headers["Authorization"] = s.Sign(url.Host, params, headers)
 
-	hreq := http.Request{
-	        URL: url,
-    	        Method: "POST",
-	        ProtoMajor: 1,
-	        ProtoMinor: 1,
-         	Close: true,
-	        Header: headers,
+	hreq := http.Request {
+	URL: url,
+    	Method: "POST",
+	ProtoMajor: 1,
+	ProtoMinor: 1,
+        Close: true,
+	Header: headers,
 	}
 
-	if query.Query != "" {
-		reader    := strings.NewReader(query.Query)
-		hreq.Body = ioutil.NopCloser(reader)
-	}
-	
-	resp, err := http.DefaultClient.Do(&hreq)
+	reader    := strings.NewReader(query.Query)
+	hreq.Body = ioutil.NopCloser(reader)
 
-	if err != nil {
-		fmt.Printf("Error calling Amazon")
-		return nil, err
+	service := Service{
+		"dynamodb",
+		s.Region.Name,
 	}
 
-	defer resp.Body.Close()
+	err = service.Sign(&s.Auth, &hreq)
 
-	body, err := ioutil.ReadAll(resp.Body)
+	if err == nil {
+		resp, err := http.DefaultClient.Do(&hreq)
 
-	if err != nil {
-		fmt.Printf("Could not read response body")
-		return nil, err
+		if err != nil {
+			fmt.Printf("Error calling Amazon")
+			return nil, err
+		}
+
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+
+		if err != nil {
+			fmt.Printf("Could not read response body")
+			return nil, err
+		}
+
+		return body, nil
+
 	}
 
-	return body, nil
+	return nil, err
 
 }
 
-func requestDate() string {	
-	now := time.Now()
-	return now.Format(time.RFC3339)
+func requestDate() string {
+	now := time.Now().UTC()
+	return now.Format(http.TimeFormat)
 }
