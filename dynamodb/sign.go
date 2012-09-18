@@ -43,6 +43,11 @@ func (s *Service) sign(k *aws.Auth, t time.Time) []byte {
 	return h
 }
 
+// For Testing.
+func (s *Service) DerivedKey(k *aws.Auth, t time.Time) []byte {
+	return s.sign(k, t)
+}
+
 // Sign signs an HTTP request with the given AWS keys for use on service s.
 func (s *Service) Sign(keys *aws.Auth, r *http.Request) error {
 	var t time.Time
@@ -94,6 +99,7 @@ func (s *Service) writeQuery(w io.Writer, r *http.Request) {
 		if i > 0 {
 			w.Write([]byte{'&'})
 		}
+
 		w.Write([]byte(s))
 	}
 }
@@ -110,6 +116,7 @@ func (s *Service) writeHeader(w io.Writer, r *http.Request) {
 		if i > 0 {
 			w.Write(lf)
 		}
+
 		io.WriteString(w, s)
 	}
 }
@@ -127,9 +134,15 @@ func (s *Service) writeHeaderList(w io.Writer, r *http.Request) {
 		}
 		w.Write([]byte(s))
 	}
+
 }
 
 func (s *Service) writeBody(w io.Writer, r *http.Request) {
+	if r.Body == nil {
+		reader := strings.NewReader("")
+		r.Body =  ioutil.NopCloser(reader)
+	}
+
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		panic(err)
@@ -138,7 +151,11 @@ func (s *Service) writeBody(w io.Writer, r *http.Request) {
 
 	h := sha256.New()
 	h.Write(b)
-	fmt.Fprintf(w, "%x", h.Sum(nil))
+	
+	sum := h.Sum(nil)
+
+
+	fmt.Fprintf(w, "%x", sum)
 }
 
 func (s *Service) writeURI(w io.Writer, r *http.Request) {
@@ -151,10 +168,16 @@ func (s *Service) writeURI(w io.Writer, r *http.Request) {
 	if path != "/" && slash {
 		path += "/"
 	}
+
+	
 	w.Write([]byte(path))
 }
 
 func (s *Service) writeRequest(w io.Writer, r *http.Request) {
+	if r.Host == "" {
+		panic("Host header required")
+	}
+
 	r.Header.Set("host", r.Host)
 
 	w.Write([]byte(r.Method))
@@ -172,6 +195,7 @@ func (s *Service) writeRequest(w io.Writer, r *http.Request) {
 }
 
 func (s *Service) writeStringToSign(w io.Writer, t time.Time, r *http.Request) {
+
 	w.Write([]byte("AWS4-HMAC-SHA256"))
 	w.Write(lf)
 	w.Write([]byte(t.Format(iSO8601BasicFormat)))
@@ -182,7 +206,6 @@ func (s *Service) writeStringToSign(w io.Writer, t time.Time, r *http.Request) {
 
 	h := sha256.New()
 	s.writeRequest(h, r)
-	fmt.Fprintf(w, "%x", h.Sum(nil))
 }
 
 func (s *Service) creds(t time.Time) string {

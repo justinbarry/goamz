@@ -39,26 +39,16 @@ type Attribute struct {
 }
 
 func (s *Server) queryServer(target string, params url.Values, query *Query) ([]byte, error) {
-	url, err := url.Parse(s.Region.DynamoDBEndpoint)
 
-	headers := map[string][]string{
-		"content-type": {"application/x-amz-json-1.0"},
-		"Date": {requestDate()},
-		"x-amz-target": {target},
-	}
+	hreq, err := http.NewRequest("POST", s.Region.DynamoDBEndpoint, nil)
 
 	if err != nil {
 		return nil, err
 	}
 
-	hreq := http.Request {
-	URL: url,
-    	Method: "POST",
-	ProtoMajor: 1,
-	ProtoMinor: 1,
-        Close: true,
-	Header: headers,
-	}
+	hreq.Header.Add("content-type", "application/x-amz-json-1.0")
+	hreq.Header.Add("Date", requestDate())
+	hreq.Header.Add("x-amz-target", target)
 
 	reader    := strings.NewReader(query.Query)
 	hreq.Body = ioutil.NopCloser(reader)
@@ -68,10 +58,12 @@ func (s *Server) queryServer(target string, params url.Values, query *Query) ([]
 		s.Region.Name,
 	}
 
-	err = service.Sign(&s.Auth, &hreq)
+	err = service.Sign(&s.Auth, hreq)
 
+	fmt.Printf("Body: %s\n", hreq.Body)
+	
 	if err == nil {
-		resp, err := http.DefaultClient.Do(&hreq)
+		resp, err := http.DefaultClient.Do(hreq)
 
 		if err != nil {
 			fmt.Printf("Error calling Amazon")

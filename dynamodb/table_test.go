@@ -18,7 +18,7 @@ func TestListTables(t *testing.T){
 	}
 
 	auth, err := aws.EnvAuth()
-	
+
 	if err != nil {
 		t.Log(err)
 		t.FailNow()
