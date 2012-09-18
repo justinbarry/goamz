@@ -4,12 +4,12 @@ import simplejson "github.com/bitly/go-simplejson"
 import (
 	"errors"
 	"fmt"
-	)
+)
 
 type Table struct {
-	Name string
-	Key PrimaryKey
-	ReadCapacity int
+	Name          string
+	Key           PrimaryKey
+	ReadCapacity  int
 	WriteCapacity int
 }
 
@@ -52,5 +52,3 @@ func (s *Server) ListTables(query *Query) ([]string, error) {
 func target(name string) string {
 	return "DynamoDB_20111205." + name
 }
-
-

@@ -1,12 +1,12 @@
 package dynamodb
 
 import (
-	"goamz/aws"
 	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"goamz/aws"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -140,7 +140,7 @@ func (s *Service) writeHeaderList(w io.Writer, r *http.Request) {
 func (s *Service) writeBody(w io.Writer, r *http.Request) {
 	if r.Body == nil {
 		reader := strings.NewReader("")
-		r.Body =  ioutil.NopCloser(reader)
+		r.Body = ioutil.NopCloser(reader)
 	}
 
 	b, err := ioutil.ReadAll(r.Body)
@@ -151,9 +151,8 @@ func (s *Service) writeBody(w io.Writer, r *http.Request) {
 
 	h := sha256.New()
 	h.Write(b)
-	
-	sum := h.Sum(nil)
 
+	sum := h.Sum(nil)
 
 	fmt.Fprintf(w, "%x", sum)
 }
@@ -169,7 +168,6 @@ func (s *Service) writeURI(w io.Writer, r *http.Request) {
 		path += "/"
 	}
 
-	
 	w.Write([]byte(path))
 }
 
@@ -217,4 +215,3 @@ func ghmac(key, data []byte) []byte {
 	h.Write(data)
 	return h.Sum(nil)
 }
-

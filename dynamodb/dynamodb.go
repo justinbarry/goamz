@@ -1,14 +1,14 @@
 package dynamodb
 
 import (
+	"fmt"
 	"goamz/aws"
-	"net/http"
-	"time"
 	"io/ioutil"
+	"net/http"
 	"net/url"
 	"strings"
-	"fmt"
-	)
+	"time"
+)
 
 type Server struct {
 	Auth   aws.Auth
@@ -20,7 +20,7 @@ type Query struct {
 }
 
 type PrimaryKey struct {
-	Key string
+	Key            string
 	RangeAttribute ValueType
 }
 
@@ -29,12 +29,12 @@ type ValueType struct {
 }
 
 type Item struct {
-	Key PrimaryKey
+	Key        PrimaryKey
 	Attributes []Attribute
 }
 
 type Attribute struct {
-	Name string
+	Name  string
 	Value ValueType
 }
 
@@ -50,7 +50,7 @@ func (s *Server) queryServer(target string, params url.Values, query *Query) ([]
 	hreq.Header.Add("Date", requestDate())
 	hreq.Header.Add("x-amz-target", target)
 
-	reader    := strings.NewReader(query.Query)
+	reader := strings.NewReader(query.Query)
 	hreq.Body = ioutil.NopCloser(reader)
 
 	service := Service{
@@ -61,7 +61,7 @@ func (s *Server) queryServer(target string, params url.Values, query *Query) ([]
 	err = service.Sign(&s.Auth, hreq)
 
 	fmt.Printf("Body: %s\n", hreq.Body)
-	
+
 	if err == nil {
 		resp, err := http.DefaultClient.Do(hreq)
 
