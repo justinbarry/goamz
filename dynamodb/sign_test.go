@@ -54,7 +54,7 @@ func TestSign(t *testing.T) {
 		t.FailNow()
 	}
 	authHeader := r.Header.Get("Authorization")
-	expectedAuth := "AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20110909/us-east-1/host/aws4_request, SignedHeaders=date;host, Signature=9a702034bd5925037e98565f48ec0de29d88a4d35526611798d21393cf04a3e3"
+	expectedAuth := "AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20110909/us-east-1/host/aws4_request, SignedHeaders=date;host, Signature=3576498fabe29305d8fbe7ebae518bd911549c9fb124b935f64366d72c1f7983"
 
 	if authHeader != expectedAuth {
 		t.Logf("Authorization Does Not Match")

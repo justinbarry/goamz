@@ -40,18 +40,16 @@ type Attribute struct {
 
 func (s *Server) queryServer(target string, params url.Values, query *Query) ([]byte, error) {
 
-	hreq, err := http.NewRequest("POST", s.Region.DynamoDBEndpoint, nil)
+	data := strings.NewReader(query.Query)
+	hreq, err := http.NewRequest("POST", s.Region.DynamoDBEndpoint +"/", data)
 
 	if err != nil {
 		return nil, err
 	}
-
-	hreq.Header.Add("content-type", "application/x-amz-json-1.0")
-	hreq.Header.Add("Date", requestDate())
-	hreq.Header.Add("x-amz-target", target)
-
-	reader := strings.NewReader(query.Query)
-	hreq.Body = ioutil.NopCloser(reader)
+	
+	hreq.Header.Set("Date", requestDate())
+	hreq.Header.Set("Content-Type", "application/x-amz-json-1.0")
+	hreq.Header.Set("X-Amz-Target", target)
 
 	service := Service{
 		"dynamodb",
@@ -60,9 +58,8 @@ func (s *Server) queryServer(target string, params url.Values, query *Query) ([]
 
 	err = service.Sign(&s.Auth, hreq)
 
-	fmt.Printf("Body: %s\n", hreq.Body)
-
 	if err == nil {
+
 		resp, err := http.DefaultClient.Do(hreq)
 
 		if err != nil {

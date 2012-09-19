@@ -24,14 +24,20 @@ func TestListTables(t *testing.T) {
 	}
 
 	server := dynamodb.Server{auth, aws.USEast}
-	query := &dynamodb.Query{""}
-	tables, err := server.ListTables(query)
+	query := dynamodb.Query{"{}"}
+	
+	tables, err := server.ListTables(&query)
 
 	if err != nil {
 		t.Log(err.Error())
 		t.FailNow()
 	}
 
-	fmt.Printf("tables %x", tables)
+	if len(tables) == 0 {
+		t.Log("Expected table to be returned")
+		t.FailNow()
+	}
+
+	fmt.Printf("tables %s\n", tables)
 
 }

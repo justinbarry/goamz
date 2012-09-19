@@ -138,15 +138,17 @@ func (s *Service) writeHeaderList(w io.Writer, r *http.Request) {
 }
 
 func (s *Service) writeBody(w io.Writer, r *http.Request) {
-	if r.Body == nil {
-		reader := strings.NewReader("")
-		r.Body = ioutil.NopCloser(reader)
+	var b []byte
+	if r.Body == nil { 
+		b = []byte("")
+	} else {
+		var err error
+		b, err = ioutil.ReadAll(r.Body)
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		panic(err)
-	}
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(b))
 
 	h := sha256.New()
@@ -172,10 +174,6 @@ func (s *Service) writeURI(w io.Writer, r *http.Request) {
 }
 
 func (s *Service) writeRequest(w io.Writer, r *http.Request) {
-	if r.Host == "" {
-		panic("Host header required")
-	}
-
 	r.Header.Set("host", r.Host)
 
 	w.Write([]byte(r.Method))
@@ -193,7 +191,6 @@ func (s *Service) writeRequest(w io.Writer, r *http.Request) {
 }
 
 func (s *Service) writeStringToSign(w io.Writer, t time.Time, r *http.Request) {
-
 	w.Write([]byte("AWS4-HMAC-SHA256"))
 	w.Write(lf)
 	w.Write([]byte(t.Format(iSO8601BasicFormat)))
@@ -204,6 +201,7 @@ func (s *Service) writeStringToSign(w io.Writer, t time.Time, r *http.Request) {
 
 	h := sha256.New()
 	s.writeRequest(h, r)
+	fmt.Fprintf(w, "%x", h.Sum(nil))
 }
 
 func (s *Service) creds(t time.Time) string {
