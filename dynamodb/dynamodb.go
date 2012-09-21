@@ -5,10 +5,15 @@ import (
 	"goamz/aws"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 )
+
+const (
+	TYPE_STRING = "S"
+	TYPE_NUMBER = "N"
+	TYPE_BIN    = "B"
+	)
 
 type Server struct {
 	Auth   aws.Auth
@@ -19,27 +24,45 @@ type Query struct {
 	Query string
 }
 
+func NewQuery(queryParts []string) *Query {
+	return &Query{
+		"{" + strings.Join(queryParts, ",") +"}",
+	}
+}
+
 type PrimaryKey struct {
-	Key            string
-	RangeAttribute ValueType
-}
-
-type ValueType struct {
-	Value string
-}
-
-type Item struct {
-	Key        PrimaryKey
-	Attributes []Attribute
+	KeyAttribute   *Attribute
+	RangeAttribute *Attribute
 }
 
 type Attribute struct {
-	Name  string
-	Value ValueType
+	Type  string
+	Name string
+	Value string
 }
 
-func (s *Server) queryServer(target string, params url.Values, query *Query) ([]byte, error) {
+func NewStringAttribute(name string, value string) *Attribute {
+	return &Attribute{ TYPE_STRING,
+		name,
+		value,
+	}
+}
 
+func NewNumericAttribute(name string, value string) *Attribute {
+	return &Attribute{ TYPE_NUMBER,
+		name,
+		value,
+	}
+}
+
+func NewBinaryAttribute(name string, value string) *Attribute {
+	return &Attribute{ TYPE_BIN,
+		name,
+		value,
+	}
+}
+
+func (s *Server) queryServer(target string, query *Query) ([]byte, error) {
 	data := strings.NewReader(query.Query)
 	hreq, err := http.NewRequest("POST", s.Region.DynamoDBEndpoint +"/", data)
 
