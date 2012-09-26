@@ -9,12 +9,6 @@ import (
 	"time"
 )
 
-const (
-	TYPE_STRING = "S"
-	TYPE_NUMBER = "N"
-	TYPE_BIN    = "B"
-	)
-
 type Server struct {
 	Auth   aws.Auth
 	Region aws.Region
@@ -26,50 +20,18 @@ type Query struct {
 
 func NewQuery(queryParts []string) *Query {
 	return &Query{
-		"{" + strings.Join(queryParts, ",") +"}",
-	}
-}
-
-type PrimaryKey struct {
-	KeyAttribute   *Attribute
-	RangeAttribute *Attribute
-}
-
-type Attribute struct {
-	Type  string
-	Name string
-	Value string
-}
-
-func NewStringAttribute(name string, value string) *Attribute {
-	return &Attribute{ TYPE_STRING,
-		name,
-		value,
-	}
-}
-
-func NewNumericAttribute(name string, value string) *Attribute {
-	return &Attribute{ TYPE_NUMBER,
-		name,
-		value,
-	}
-}
-
-func NewBinaryAttribute(name string, value string) *Attribute {
-	return &Attribute{ TYPE_BIN,
-		name,
-		value,
+		"{" + strings.Join(queryParts, ",") + "}",
 	}
 }
 
 func (s *Server) queryServer(target string, query *Query) ([]byte, error) {
 	data := strings.NewReader(query.Query)
-	hreq, err := http.NewRequest("POST", s.Region.DynamoDBEndpoint +"/", data)
+	hreq, err := http.NewRequest("POST", s.Region.DynamoDBEndpoint+"/", data)
 
 	if err != nil {
 		return nil, err
 	}
-	
+
 	hreq.Header.Set("Date", requestDate())
 	hreq.Header.Set("Content-Type", "application/x-amz-json-1.0")
 	hreq.Header.Set("X-Amz-Target", target)
@@ -111,3 +73,8 @@ func requestDate() string {
 	now := time.Now().UTC()
 	return now.Format(http.TimeFormat)
 }
+
+func target(name string) string {
+	return "DynamoDB_20111205." + name
+}
+

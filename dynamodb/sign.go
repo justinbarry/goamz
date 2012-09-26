@@ -139,7 +139,7 @@ func (s *Service) writeHeaderList(w io.Writer, r *http.Request) {
 
 func (s *Service) writeBody(w io.Writer, r *http.Request) {
 	var b []byte
-	if r.Body == nil { 
+	if r.Body == nil {
 		b = []byte("")
 	} else {
 		var err error
