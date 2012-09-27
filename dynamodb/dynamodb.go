@@ -77,4 +77,3 @@ func requestDate() string {
 func target(name string) string {
 	return "DynamoDB_20111205." + name
 }
-

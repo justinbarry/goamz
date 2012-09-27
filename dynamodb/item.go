@@ -61,7 +61,7 @@ func (t *Table) PutItem(hashKey string, rangeKey string, attributes []Attribute)
 		return false, err
 	}
 
-	item, err := json.Get("ConsumedCapacityUnits").Map()
+	_, err = json.Get("ConsumedCapacityUnits").Map()
 
 	if err != nil {
 		message := fmt.Sprintf("Unexpected response %s", jsonResponse)
@@ -85,8 +85,8 @@ func itemParam(k *PrimaryKey, hashKey string, rangeKey string, attributes []Attr
 	result := "\"Item\":{" +
 		k.KeyAttribute.Name +
 		"{" +
-		keyValue(k.KeyAttribute.Type, hashKey)
-	"}"
+		keyValue(k.KeyAttribute.Type, hashKey) +
+		"}"
 
 	if k.RangeAttribute != nil {
 		result = result + "," +

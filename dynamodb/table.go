@@ -54,22 +54,18 @@ func tableParam(t *Table) string {
 }
 
 func keyParam(k *PrimaryKey, hashKey string, rangeKey string) string {
-	primaryKey := "{" + keyValue(k.KeyAttribute.Type, hashKey) + "}"
-	value := "{\"HashKeyElement\":" + primaryKey
+	value := fmt.Sprintf("{\"HashKeyElement\":{%s}", keyValue(k.KeyAttribute.Type, hashKey))
 
 	if k.RangeAttribute != nil {
-		value = fmt.Sprintf("%s,\"RangeKeyElement\":{%s}", value, keyValue(k.RangeAttribute.Type, rangeKey))
+		value = fmt.Sprintf("%s,\"RangeKeyElement\":{%s}", value,
+			keyValue(k.RangeAttribute.Type, rangeKey))
 
 	}
 
-	return "\"Key\":" + value + "}"
+	return fmt.Sprintf("\"Key\":%s}", value)
 }
 
 func keyValue(key string, value string) string {
-	ret := fmt.Sprintf("\"%s\":\"%s\"", key, value)
-	
-	return ret
+	return fmt.Sprintf("\"%s\":\"%s\"", key, value)
 }
-
-
 
