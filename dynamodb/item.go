@@ -73,6 +73,41 @@ func (t *Table) PutItem(hashKey string, rangeKey string, attributes []Attribute)
 	return true, nil
 }
 
+func (t *Table) AddItem(hashKey string, rangeKey string, attributes []Attribute) (bool, error) {
+	if len(attributes) == 0 {
+		return false, errors.New("At least one attribute is required.")
+	}
+
+	queryParts := []string{
+		tableParam(t),
+		incrementParam(&t.Key, hashKey, rangeKey, attributes),
+	}
+
+	fmt.Printf("query : %s", queryParts)
+	q := NewQuery(queryParts)
+
+	jsonResponse, err := t.Server.queryServer(target("UpdateItem"), q)
+
+	if err != nil {
+		return false, err
+	}
+
+	json, err := simplejson.NewJson(jsonResponse)
+
+	if err != nil {
+		return false, err
+	}
+
+	_, err = json.Get("ConsumedCapacityUnits").Map()
+
+	if err != nil {
+		message := fmt.Sprintf("Unexpected response %s", jsonResponse)
+		return false, errors.New(message)
+	}
+
+	return true, nil
+}
+
 // Example Request Json
 //    "Item":{
 //        "AttributeName1":{"S":"AttributeValue1"},
@@ -105,6 +140,46 @@ func itemParam(k *PrimaryKey, hashKey string, rangeKey string, attributes []Attr
 	}
 
 	return result + "}"
+}
+
+/*
+{"TableName":"Table1",
+    "Key":
+        {"HashKeyElement":{"S":"AttributeValue1"},
+        "RangeKeyElement":{"N":"AttributeValue2"}},
+    "AttributeUpdates":{"AttributeName3":{"Value":{"S":"AttributeValue3_New"},"Action":"PUT"}},
+    "Expected":{"AttributeName3":{"Value":{"S":"AttributeValue3_Current"}}},
+    "ReturnValues":"ReturnValuesConstant"
+}
+
+*/
+func incrementParam(k *PrimaryKey, hashKey string, rangeKey string, attributes []Attribute) string {
+
+	result := "\"Key\":{\"" +
+	k.KeyAttribute.Name +
+		"\":{" +
+		keyValue(k.KeyAttribute.Type, hashKey) +
+		"}"
+
+	if k.RangeAttribute != nil {
+		result = result + ",\"" +
+			k.RangeAttribute.Name +
+			"\":{" +
+			keyValue(k.RangeAttribute.Type, rangeKey) +
+			"}"
+	}
+
+	result = result + "\"AttributeUpdates\":{"
+
+	for _, attribute := range attributes {
+		result = result + "\"" +
+			attribute.Name + "\": {" +
+			keyValue(attribute.Type, attribute.Value) + "}"
+	}
+
+	result = result + "\"Action\":\"Add\"}"
+
+	return result + " }"
 }
 
 func parseAttributes(s map[string]interface{}) map[string]*Attribute {
