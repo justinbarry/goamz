@@ -14,18 +14,22 @@ type Server struct {
 	Region aws.Region
 }
 
+/*
 type Query struct {
 	Query string
 }
+*/
 
+/*
 func NewQuery(queryParts []string) *Query {
 	return &Query{
 		"{" + strings.Join(queryParts, ",") + "}",
 	}
 }
+*/
 
 func (s *Server) queryServer(target string, query *Query) ([]byte, error) {
-	data := strings.NewReader(query.Query)
+	data := strings.NewReader(query.String())
 	hreq, err := http.NewRequest("POST", s.Region.DynamoDBEndpoint+"/", data)
 
 	if err != nil {

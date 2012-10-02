@@ -7,12 +7,8 @@ import (
 )
 
 func (t *Table) GetItem(hashKey string, rangeKey string) (map[string]*Attribute, error) {
-	queryParts := []string{
-		tableParam(t),
-		keyParam(&t.Key, hashKey, rangeKey),
-	}
-
-	q := NewQuery(queryParts)
+	q := NewQuery(t)
+	q.AddKey(t, hashKey, rangeKey)
 
 	jsonResponse, err := t.Server.queryServer(target("GetItem"), q)
 
@@ -43,13 +39,12 @@ func (t *Table) PutItem(hashKey string, rangeKey string, attributes []Attribute)
 		return false, errors.New("At least one attribute is required.")
 	}
 
-	queryParts := []string{
-		tableParam(t),
-		itemParam(&t.Key, hashKey, rangeKey, attributes),
-	}
+	q := NewQuery(t)
+	
+	keys := t.Key.Clone(hashKey, rangeKey)
+	attributes = append(attributes, keys...)
 
-	fmt.Printf("query : %s", queryParts)
-	q := NewQuery(queryParts)
+	q.AddItem(attributes)
 
 	jsonResponse, err := t.Server.queryServer(target("PutItem"), q)
 
@@ -74,17 +69,14 @@ func (t *Table) PutItem(hashKey string, rangeKey string, attributes []Attribute)
 }
 
 func (t *Table) AddItem(hashKey string, rangeKey string, attributes []Attribute) (bool, error) {
+
 	if len(attributes) == 0 {
 		return false, errors.New("At least one attribute is required.")
 	}
 
-	queryParts := []string{
-		tableParam(t),
-		incrementParam(&t.Key, hashKey, rangeKey, attributes),
-	}
-
-	fmt.Printf("query : %s", queryParts)
-	q := NewQuery(queryParts)
+	q := NewQuery(t)
+	q.AddKey(t, hashKey, rangeKey)
+	q.AddUpdates(attributes, "ADD")
 
 	jsonResponse, err := t.Server.queryServer(target("UpdateItem"), q)
 
@@ -106,80 +98,7 @@ func (t *Table) AddItem(hashKey string, rangeKey string, attributes []Attribute)
 	}
 
 	return true, nil
-}
-
-// Example Request Json
-//    "Item":{
-//        "AttributeName1":{"S":"AttributeValue1"},
-//        "AttributeName2":{"N":"AttributeValue2"},
-//        "AttributeName5":{"B":"dmFsdWU="}
-//    },
-//    "Expected":{"AttributeName3":{"Value": {"S":"AttributeValue"}, "Exists":Boolean}},
-//    "ReturnValues":"ReturnValuesConstant"}
-
-func itemParam(k *PrimaryKey, hashKey string, rangeKey string, attributes []Attribute) string {
-
-	result := "\"Item\":{\"" +
-		k.KeyAttribute.Name +
-		"\":{" +
-		keyValue(k.KeyAttribute.Type, hashKey) +
-		"}"
-
-	if k.RangeAttribute != nil {
-		result = result + ",\"" +
-			k.RangeAttribute.Name +
-			"\":{" +
-			keyValue(k.RangeAttribute.Type, rangeKey) +
-			"}"
-	}
-
-	for _, attribute := range attributes {
-		result = result + ",\"" +
-			attribute.Name + "\": {" +
-			keyValue(attribute.Type, attribute.Value) + "}"
-	}
-
-	return result + "}"
-}
-
-/*
-{"TableName":"Table1",
-    "Key":
-        {"HashKeyElement":{"S":"AttributeValue1"},
-        "RangeKeyElement":{"N":"AttributeValue2"}},
-    "AttributeUpdates":{"AttributeName3":{"Value":{"S":"AttributeValue3_New"},"Action":"PUT"}},
-    "Expected":{"AttributeName3":{"Value":{"S":"AttributeValue3_Current"}}},
-    "ReturnValues":"ReturnValuesConstant"
-}
-
-*/
-func incrementParam(k *PrimaryKey, hashKey string, rangeKey string, attributes []Attribute) string {
-
-	result := "\"Key\":{\"" +
-	k.KeyAttribute.Name +
-		"\":{" +
-		keyValue(k.KeyAttribute.Type, hashKey) +
-		"}"
-
-	if k.RangeAttribute != nil {
-		result = result + ",\"" +
-			k.RangeAttribute.Name +
-			"\":{" +
-			keyValue(k.RangeAttribute.Type, rangeKey) +
-			"}"
-	}
-
-	result = result + ",\"AttributeUpdates\":{"
-
-	for _, attribute := range attributes {
-		result = result + "\"" +
-			attribute.Name + "\": {" +
-			keyValue(attribute.Type, attribute.Value) + "}"
-	}
-
-	result = result + ",\"Action\":\"Add\"}"
-
-	return result + " }"
+	
 }
 
 func parseAttributes(s map[string]interface{}) map[string]*Attribute {

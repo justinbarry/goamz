@@ -19,7 +19,7 @@ func (s *Server) NewTable(name string, key PrimaryKey) *Table {
 func (s *Server) ListTables() ([]string, error) {
 	var tables []string
 
-	query := &Query{"{}"}
+	query := NewEmptyQuery()
 
 	jsonResponse, err := s.queryServer(target("ListTables"), query)
 
@@ -47,10 +47,6 @@ func (s *Server) ListTables() ([]string, error) {
 	}
 
 	return tables, nil
-}
-
-func tableParam(t *Table) string {
-	return keyValue("TableName", t.Name)
 }
 
 func keyParam(k *PrimaryKey, hashKey string, rangeKey string) string {

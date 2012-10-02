@@ -37,3 +37,30 @@ func NewBinaryAttribute(name string, value string) *Attribute {
 		value,
 	}
 }
+
+func (k *PrimaryKey) HasRange() bool {
+	return k.RangeAttribute != nil
+}
+
+// Useful when you may have many goroutines using a primary key, so they don't fuxor up your values.
+func (k *PrimaryKey) Clone(h string, r string) []Attribute {
+
+	
+	pk := &Attribute{ k.KeyAttribute.Type,
+		k.KeyAttribute.Name,
+		h,
+	}
+
+	result := []Attribute{*pk}
+
+	if k.HasRange() {
+		rk := &Attribute{ k.RangeAttribute.Type,
+			k.RangeAttribute.Name,
+			r,
+		}
+
+		result = append(result, *rk)
+	}
+
+	return result	
+}
