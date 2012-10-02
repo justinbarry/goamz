@@ -47,6 +47,8 @@ func (t *Table) PutItem(hashKey string, rangeKey string, attributes []Attribute)
 		tableParam(t),
 		itemParam(&t.Key, hashKey, rangeKey, attributes),
 	}
+
+	fmt.Printf("query : %s", queryParts)
 	q := NewQuery(queryParts)
 
 	jsonResponse, err := t.Server.queryServer(target("PutItem"), q)
