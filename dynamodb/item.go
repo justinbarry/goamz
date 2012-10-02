@@ -58,7 +58,7 @@ func (t *Table) PutItem(hashKey string, rangeKey string, attributes []Attribute)
 		return false, err
 	}
 
-	_, err = json.Get("ConsumedCapacityUnits").Map()
+	_, err = json.Get("ConsumedCapacityUnits")
 
 	if err != nil {
 		message := fmt.Sprintf("Unexpected response %s", jsonResponse)
