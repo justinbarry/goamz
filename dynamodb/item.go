@@ -84,9 +84,9 @@ func (t *Table) PutItem(hashKey string, rangeKey string, attributes []Attribute)
 
 func itemParam(k *PrimaryKey, hashKey string, rangeKey string, attributes []Attribute) string {
 
-	result := "\"Item\":{" +
+	result := "\"Item\":{\"" +
 		k.KeyAttribute.Name +
-		"{" +
+		"\":{" +
 		keyValue(k.KeyAttribute.Type, hashKey) +
 		"}"
 
