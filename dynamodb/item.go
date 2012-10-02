@@ -91,16 +91,16 @@ func itemParam(k *PrimaryKey, hashKey string, rangeKey string, attributes []Attr
 		"}"
 
 	if k.RangeAttribute != nil {
-		result = result + "," +
+		result = result + ",\"" +
 			k.RangeAttribute.Name +
-			": {" +
+			"\":{" +
 			keyValue(k.RangeAttribute.Type, rangeKey) +
 			"}"
 	}
 
 	for _, attribute := range attributes {
-		result = result + "," +
-			attribute.Name + ": {" +
+		result = result + ",\"" +
+			attribute.Name + "\": {" +
 			keyValue(attribute.Type, attribute.Value) + "}"
 	}
 
