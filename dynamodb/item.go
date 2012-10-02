@@ -169,7 +169,7 @@ func incrementParam(k *PrimaryKey, hashKey string, rangeKey string, attributes [
 			"}"
 	}
 
-	result = result + "\"AttributeUpdates\":{"
+	result = result + ",\"AttributeUpdates\":{"
 
 	for _, attribute := range attributes {
 		result = result + "\"" +
@@ -177,7 +177,7 @@ func incrementParam(k *PrimaryKey, hashKey string, rangeKey string, attributes [
 			keyValue(attribute.Type, attribute.Value) + "}"
 	}
 
-	result = result + "\"Action\":\"Add\"}"
+	result = result + ",\"Action\":\"Add\"}"
 
 	return result + " }"
 }
