@@ -200,6 +200,5 @@ func addComma(b *bytes.Buffer) {
 
 func (q *Query) String() string {
 	qs := fmt.Sprintf("{%s}", q.buffer.String())
-	fmt.Printf("%s\n", qs)
 	return qs
 }
