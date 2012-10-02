@@ -58,9 +58,9 @@ func (t *Table) PutItem(hashKey string, rangeKey string, attributes []Attribute)
 		return false, err
 	}
 
-	_, err = json.Get("ConsumedCapacityUnits")
+	units := json.Get("ConsumedCapacityUnits")
 
-	if err != nil {
+	if units == nil {
 		message := fmt.Sprintf("Unexpected response %s", jsonResponse)
 		return false, errors.New(message)
 	}
@@ -90,9 +90,9 @@ func (t *Table) AddItem(hashKey string, rangeKey string, attributes []Attribute)
 		return false, err
 	}
 
-	_, err = json.Get("ConsumedCapacityUnits").Map()
+	units := json.Get("ConsumedCapacityUnits")
 
-	if err != nil {
+	if units == nil {
 		message := fmt.Sprintf("Unexpected response %s", jsonResponse)
 		return false, errors.New(message)
 	}
